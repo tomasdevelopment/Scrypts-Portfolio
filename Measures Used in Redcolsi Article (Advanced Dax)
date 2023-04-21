@@ -1,0 +1,42 @@
+//Counting only soft Skills that matched during the data processing done on the python step transformation listed on this library too
+
+MatchingHardSkill = CALCULATE(COUNT(TransformedDataAdzunaApi[results.id]),FILTER(TransformedDataAdzunaApi,TransformedDataAdzunaApi[HardSkill]<>""))
+
+MatchingSoftSkill = CALCULATE(COUNT(TransformedDataAdzunaApi[results.id]),FILTER(TransformedDataAdzunaApi,TransformedDataAdzunaApi[SoftSkill]<>""))
+
+
+//Showing percentage of  the soft and hard skill matches only
+only
+
+%HardSkill = 
+VAR CountSoftSkill = 
+    CALCULATE(
+        [MatchingHardSkill],
+        FILTER(TransformedDataAdzunaApi, NOT(ISBLANK(TransformedDataAdzunaApi[HardSkill])))
+    )
+VAR CountNonBlankSoftSkill = 
+    CALCULATE(
+        COUNT(TransformedDataAdzunaApi[SoftSkill]),
+        FILTER(ALLSELECTED(TransformedDataAdzunaApi), NOT(ISBLANK(TransformedDataAdzunaApi[HardSkill])))
+    )
+RETURN
+    DIVIDE(CountSoftSkill, CountNonBlankSoftSkill)
+
+
+//Showing percentage of matches compared to all the offers of soft skills
+%OffersRequiringSoftSkill = DIVIDE([MatchingSoftSkill], [Total Offers])
+
+
+//showing top 10 skills by salaries table dax 
+
+Top10SoftSkillsSalariosTable = 
+TOPN (
+    10,
+    FILTER (
+        'BaseDataApi',
+        LEN('BaseDataApi'[found_soft_skills(HabilidadesBlandas)]) > 0
+    ),
+    'BaseDataApi'[results.salary_max],
+    DESC
+)
+
