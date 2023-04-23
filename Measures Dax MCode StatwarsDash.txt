@@ -1,0 +1,314 @@
+// Power bi Dax code
+
+
+
+//Measures
+
+/1
+Avg Passenger Cost Efficiency by Starship = 
+AVERAGEX(
+    'Starships Dimension',
+    DIVIDE(
+        'Starships Dimension'[passengers],
+        'Starships Dimension'[cost_in_credits]
+    )
+)
+
+/2
+
+Max Megalight Per Hour by  Class = 
+CALCULATE (
+    MAX ( 'Starships Dimension'[MGLT] ),
+    ALLEXCEPT ( 'Starships Dimension', 'Starships Dimension'[starship_class] )
+)
+
+/3
+Smallest Species Name = 
+VAR MinHeight = CALCULATE(MIN('Species Dimension Table'[average_height]))
+RETURN CALCULATE(
+    FIRSTNONBLANK('Species Dimension Table'[SpeciesName], 1),
+    'Species Dimension Table'[average_height] = MinHeight
+)
+
+/4
+
+Total Species = CALCULATE(DISTINCTCOUNT('Species Dimension Table'[SpeciesName]),ALL('Species Dimension Table'))
+
+
+
+//Starcraft top 3 and bottom 3 by speed
+
+Bottom  3 Slowest  Classes Table = 
+VAR Bottom3Classes = 
+    TOPN (
+        3,
+        SUMMARIZE (
+            'Starships Dimension',
+            'Starships Dimension'[starship_class],
+            "Min Speed", [Min Megalight Per Hour by  Class]
+        ),
+        [Min Speed],
+        ASC
+    )
+RETURN
+    Bottom3Classes
+
+
+//change DESC for bottom 3
+
+
+
+//DAx table for top 3 by h avg heigh*Avg mass
+Top 3 Characters by Height and Mass = 
+VAR UniqueCharacters =
+    SUMMARIZE (
+        'Characters Fact Table',
+        'Characters Fact Table'[url],
+        'Characters Fact Table'[Charactersname],
+        "Height", AVERAGEX('Characters Fact Table','Characters Fact Table'[height]),
+        "AvgMass", AVERAGEX('Characters Fact Table', 'Characters Fact Table'[mass])
+    )
+VAR Top3Characters =
+    TOPN (
+        3,
+        UniqueCharacters,
+        [Height] * [AvgMass],
+        DESC
+    )
+RETURN
+    Top3Characters
+//change ASC for bottom 3
+
+Bottom 3 Characters by Height and Mass = 
+VAR UniqueCharacters =
+    SUMMARIZE (
+        'Characters Fact Table',
+        'Characters Fact Table'[url],
+        'Characters Fact Table'[Charactersname],
+        "AvgHeight", AVERAGEX('Characters Fact Table', 'Characters Fact Table'[height]),
+        "AvgMass", AVERAGEX('Characters Fact Table', 'Characters Fact Table'[mass])
+    )
+VAR FilteredCharacters =
+    FILTER (
+        UniqueCharacters,
+        NOT ISBLANK([AvgMass])
+    )
+VAR Bottom3Characters =
+    TOPN (
+        3,
+        FilteredCharacters,
+        [AvgHeight] * [AvgMass],
+        ASC
+    )
+RETURN
+    Bottom3Characters
+
+//special case due to empty masses
+
+//
+
+Calculated Column 
+//Calculates attractiveness score based on surface water and climate
+Attractiveness Score = 
+VAR ClimateScore =
+    SWITCH(
+        'Planets Details  Dimension'[climate],
+        "Temperate", 5,
+        "Tropical", 4,
+        "Murky", 2,
+        "Arid", 1,
+        0
+    )
+VAR SurfaceWaterScore = IF(ISBLANK('Planets Details  Dimension'[surface_water]), 0, 'Planets Details  Dimension'[surface_water]) / 100
+
+RETURN (ClimateScore * SurfaceWaterScore) * 10
+
+
+
+//Queries
+
+
+
+
+
+//--//
+
+//M Code
+//Measures table
+
+let
+    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [measures = _t]),
+    #"Changed Type" = Table.TransformColumnTypes(Source,{{"measures", type text}})
+in
+    #"Changed Type"
+	
+	
+// Starships Dimension 
+let
+    Source = Json.Document(Web.Contents("https://swapi.dev/api/starships/")),
+    #"Converted to Table" = Table.FromRecords({Source}),
+    #"Expanded results" = Table.ExpandListColumn(#"Converted to Table", "results"),
+    #"Expanded results1" = Table.ExpandRecordColumn(#"Expanded results", "results", {"name", "model", "manufacturer", "cost_in_credits", "length", "crew", "passengers", "cargo_capacity", "consumables", "MGLT", "starship_class", "pilots", "films", "created", "edited", "url", "height", "mass", "hair_color", "skin_color", "eye_color", "birth_year", "gender", "homeworld", "species", "vehicles", "starships"}, {"results.name", "results.model", "results.manufacturer", "results.cost_in_credits", "results.length", "results.crew", "results.passengers", "results.cargo_capacity", "results.consumables", "results.MGLT", "results.starship_class", "results.pilots", "results.films", "results.created", "results.edited", "results.url", "results.height", "results.mass", "results.hair_color", "results.skin_color", "results.eye_color", "results.birth_year", "results.gender", "results.homeworld", "results.species", "results.vehicles", "results.starships"}),
+    Custom1 = Table.RenameColumns(#"Expanded results1", List.Transform(Table.ColumnNames(#"Expanded results1"), each {_, Text.Replace(_, "results.", "")})),
+    #"Extracted Values" = Table.TransformColumns(Custom1, {"films", each Text.Combine(List.Transform(_, Text.From)), type text}),
+    #"Extracted Values1" = Table.TransformColumns(#"Extracted Values", {"pilots", each Text.Combine(List.Transform(_, Text.From)), type text}),
+    #"Changed Type" = Table.TransformColumnTypes(#"Extracted Values1",{{"count", Int64.Type}, {"next", type text}, {"previous", type any}, {"name", type text}, {"model", type text}, {"manufacturer", type text}, {"cost_in_credits", type text}, {"length", type number}, {"crew", type text}, {"passengers", type text}, {"cargo_capacity", Int64.Type}, {"consumables", type text}, {"MGLT", Int64.Type}, {"starship_class", type text}, {"pilots", type text}, {"films", type text}, {"created", type datetime}, {"edited", type datetime}, {"url", type text}, {"height", type any}, {"mass", type any}, {"hair_color", type any}, {"skin_color", type any}, {"eye_color", type any}, {"birth_year", type any}, {"gender", type any}, {"homeworld", type any}, {"species", type any}, {"vehicles", type any}, {"starships", type any}}),
+    Datanormalization = Table.RenameColumns(#"Changed Type",{{"name", "StarshipsName"}}),
+    replacedvaluestonull = Table.ReplaceValue(Datanormalization,"unknown",null,Replacer.ReplaceValue,{"cost_in_credits"}),
+    #"n/afornullinpassager" = Table.ReplaceValue(replacedvaluestonull,"n/a",null,Replacer.ReplaceValue,{"passengers"}),
+    Changedtonumberformat = Table.TransformColumnTypes(#"n/afornullinpassager",{{"passengers", type number}}),
+    replacedformaxiumcapacity = Table.ReplaceValue(Changedtonumberformat,"30-165","165",Replacer.ReplaceText,{"crew"}),
+    creditsttonumber = Table.TransformColumnTypes(replacedformaxiumcapacity,{{"crew", type number}, {"cost_in_credits", type number}}),
+    #"Capitalized Each Word in Class" = Table.TransformColumns(creditsttonumber,{{"starship_class", Text.Proper, type text}})
+in
+    #"Capitalized Each Word in Class"
+	
+
+//Planets Dimension
+let
+    Source = Json.Document(Web.Contents("https://swapi.dev/api/planets/")),
+    #"Converted to Table" = Table.FromRecords({Source}),
+    #"Expanded results" = Table.ExpandListColumn(#"Converted to Table", "results"),
+    #"Expanded results1" = Table.ExpandRecordColumn(#"Expanded results", "results", {"name", "height", "mass", "hair_color", "skin_color", "eye_color", "birth_year", "gender", "homeworld", "films", "species", "vehicles", "starships", "created", "edited", "url"}, {"results.name", "results.height", "results.mass", "results.hair_color", "results.skin_color", "results.eye_color", "results.birth_year", "results.gender", "results.homeworld", "results.films", "results.species", "results.vehicles", "results.starships", "results.created", "results.edited", "results.url"})
+   , #"Removed Prefix" = Table.RenameColumns(#"Expanded results1", List.Transform(Table.ColumnNames(#"Expanded results1"), each {_, Text.Replace(_, "results.", "")})),
+    #"Changed Type" = Table.TransformColumnTypes(#"Removed Prefix",{{"count", Int64.Type}, {"next", type text}, {"previous", type any}, {"name", type text}, {"height", type any}, {"mass", type any}, {"hair_color", type any}, {"skin_color", type any}, {"eye_color", type any}, {"birth_year", type any}, {"gender", type any}, {"homeworld", type any}, {"films", type any}, {"species", type any}, {"vehicles", type any}, {"starships", type any}, {"created", type datetime}, {"edited", type datetime}, {"url", type text}}),
+    #"Extracted Values" = Table.TransformColumns(#"Changed Type", {"films", each Text.Combine(List.Transform(_, Text.From)), type text}),
+    #"Renamed Columns" = Table.RenameColumns(#"Extracted Values",{{"name", "Planetsname"}})
+
+in
+    #"Renamed Columns"
+	
+
+// Species Dimension
+let
+    Source = Json.Document(Web.Contents("https://swapi.dev/api/species/")),
+    #"Converted to Table" = Table.FromRecords({Source}),
+    #"Expanded results" = Table.ExpandListColumn(#"Converted to Table", "results"),
+    #"Expanded results1" = Table.ExpandRecordColumn(#"Expanded results", "results", {"name", "classification", "designation", "average_height", "average_lifespan", "eye_colors", "hair_colors", "skin_colors", "language", "homeworld", "people", "films", "created", "edited", "url"}, {"results.name", "results.classification", "results.designation", "results.average_height", "results.average_lifespan", "results.eye_colors", "results.hair_colors", "results.skin_colors", "results.language", "results.homeworld", "results.people", "results.films", "results.created", "results.edited", "results.url"}),
+    #"Extracted Values" = Table.TransformColumns(#"Expanded results1", {"results.people", each Text.Combine(List.Transform(_, Text.From)), type text}),
+    #"Removed Prefix" = Table.RenameColumns(#"Extracted Values", List.Transform(Table.ColumnNames(#"Extracted Values"), each {_, Text.Replace(_, "results.", "")})),
+    #"Changed Type" = Table.TransformColumnTypes(#"Removed Prefix",{{"count", Int64.Type}, {"next", type text}, {"previous", type any}, {"name", type text}, {"classification", type text}, {"designation", type text}, {"average_height", Int64.Type}, {"average_lifespan", Int64.Type}, {"eye_colors", type text}, {"hair_colors", type text}, {"skin_colors", type text}, {"language", type text}, {"homeworld", type text}, {"people", type any}, {"films", type any}, {"created", type datetime}, {"edited", type datetime}, {"url", type text}}),
+    #"Replaced Errors1" = Table.ReplaceErrorValues(#"Changed Type", {{"average_height", null}}),
+    #"Replaced Errors" = Table.ReplaceErrorValues(#"Replaced Errors1", {{"average_lifespan", null}}),
+    #"Renamed Columns" = Table.RenameColumns(#"Replaced Errors",{{"name", "SpeciesName"}})
+in
+    #"Renamed Columns"
+	
+
+//Planet details dimension
+
+//// Define a function called 'GetPlanet' that takes a planet ID as input (planetId) and returns a record with the planet's details
+let
+    GetPlanet = (planetId as number) as record =>
+        let
+            // Call the API with the specified planetId and parse the JSON response
+            Source = Json.Document(Web.Contents("https://swapi.dev/api/planets/" & Text.From(planetId) & "/")),
+            
+            // Convert the JSON response (record) into a single-row table
+            #"Converted to Table" = Table.FromRecords({Source}),
+            
+            // Extract the values from the 'films' column (a list), concatenate them using Text.Combine, and update the column type to 'text'
+            #"Extracted Values" = Table.TransformColumns(#"Converted to Table", {"films", each Text.Combine(List.Transform(_, Text.From)), type text}),
+            
+            // Extract the values from the 'residents' column (a list), concatenate them using Text.Combine, and update the column type to 'text'
+            #"Extracted Values1" = Table.TransformColumns(#"Extracted Values", {"residents", each Text.Combine(List.Transform(_, Text.From)), type text}),
+            
+            // Get the first (and only) row of the table as a record
+            PlanetRecord = #"Extracted Values1"{0}
+        in
+            PlanetRecord,
+
+    // Create a list of planet IDs from 1 to 10
+    PlanetIds = {1..10},
+    
+    // Apply the 'GetPlanet' function to each planet ID in the 'PlanetIds' list
+    Planets = List.Transform(PlanetIds, each GetPlanet(_)),
+    
+    // Convert the list of planet records into a table
+    #"Converted to Table" = Table.FromRecords(Planets),
+    #"Changed Type" = Table.TransformColumnTypes(#"Converted to Table",{{"edited", type datetime}, {"created", type datetime}}),
+    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"name", "planetsname"}}),
+    #"Replaced Value" = Table.ReplaceValue(#"Renamed Columns","unknown",null,Replacer.ReplaceValue,{"surface_water"}),
+    #"Replaced Value1" = Table.ReplaceValue(#"Replaced Value","unknown",null,Replacer.ReplaceValue,{"population"}),
+    #"NormalizedClimaevravity,surface" = Table.TransformColumnTypes(#"Replaced Value1",{{"planetsname", type text}, {"rotation_period", Int64.Type}, {"orbital_period", Int64.Type}, {"diameter", Int64.Type}, {"climate", type text}, {"gravity", type text}, {"terrain", type text}, {"surface_water", Int64.Type}, {"population", Int64.Type}, {"residents", type text}, {"films", type text}, {"created", type datetime}, {"edited", type datetime}, {"url", type text}}),
+    Normalizedwordsclimate = Table.TransformColumns(#"NormalizedClimaevravity,surface",{{"climate", Text.Proper, type text}}),
+    #"Tropical normalize" = Table.ReplaceValue(Normalizedwordsclimate,"Temperate, Tropical","Tropical",Replacer.ReplaceText,{"climate"})
+in
+    #"Tropical normalize"
+	
+	
+//Vehicles Dimension
+let
+    Source = Json.Document(Web.Contents("https://swapi.dev/api/vehicles/")),
+    #"Converted to Table" = Table.FromRecords({Source}),
+    #"Expanded results" = Table.ExpandListColumn(#"Converted to Table", "results"),
+    #"Expanded results1" = Table.ExpandRecordColumn(#"Expanded results", "results", {"name", "height", "mass", "hair_color", "skin_color", "eye_color", "birth_year", "gender", "homeworld", "films", "species", "vehicles", "starships", "created", "edited", "url"}, {"results.name", "results.height", "results.mass", "results.hair_color", "results.skin_color", "results.eye_color", "results.birth_year", "results.gender", "results.homeworld", "results.films", "results.species", "results.vehicles", "results.starships", "results.created", "results.edited", "results.url"}),
+    #"Removed Prefix" = Table.RenameColumns(#"Expanded results1", List.Transform(Table.ColumnNames(#"Expanded results1"), each {_, Text.Replace(_, "results.", "")})),
+    #"Extracted Values" = Table.TransformColumns(#"Removed Prefix", {"films", each Text.Combine(List.Transform(_, Text.From)), type text}),
+    #"Changed Type" = Table.TransformColumnTypes(#"Extracted Values",{{"created", type datetime}, {"edited", type datetime}}),
+    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"name", "vehicles name"}})
+in
+    #"Renamed Columns"
+	
+	
+//Planet terains dimension
+let
+    Source = #"Planets Details  Dimension",
+    #"Removed Other Columns" = Table.SelectColumns(Source,{"terrain", "planetsname", "url"}),
+    #"Split Column by Delimiter" = Table.SplitColumn(#"Removed Other Columns", "terrain", Splitter.SplitTextByDelimiter(",", QuoteStyle.Csv), {"terrain.1", "terrain.2", "terrain.3", "terrain.4"}),
+    #"Changed Type" = Table.TransformColumnTypes(#"Split Column by Delimiter",{{"terrain.1", type text}, {"terrain.2", type text}, {"terrain.3", type text}, {"terrain.4", type text}}),
+    #"Unpivoted Columns" = Table.UnpivotOtherColumns(#"Changed Type", {"planetsname", "url"}, "Attribute", "Value"),
+    #"Renamed Columns" = Table.RenameColumns(#"Unpivoted Columns",{{"Value", "Terrain"}}),
+    #"Removed Columns" = Table.RemoveColumns(#"Renamed Columns",{"Attribute"}),
+    #"Cleaned Text" = Table.TransformColumns(#"Removed Columns",{{"Terrain", Text.Clean, type text}}),
+    #"Trimmed Text" = Table.TransformColumns(#"Cleaned Text",{{"Terrain", Text.Trim, type text}}),
+    #"Capitalized Each Word" = Table.TransformColumns(#"Trimmed Text",{{"Terrain", Text.Proper, type text}})
+in
+    #"Capitalized Each Word"
+	
+// Characters fact table
+
+let
+    Source = "https://swapi.dev/api/people/",
+    GetPeopleData = (url as text) as list =>
+        let
+            json = try Json.Document(Web.Contents(url)) otherwise null,
+            results = if json <> null then json[results] else {},
+            next = try json[next] otherwise null,
+            nextPage = if next <> null then @GetPeopleData(next) else {}
+        in
+            results & nextPage,
+    AllCharacters = GetPeopleData(Source),
+    #"Converted to Table" = Table.FromList(AllCharacters, Splitter.SplitByNothing()),
+    #"Expanded results" = Table.ExpandRecordColumn(#"Converted to Table", "Column1", {"name", "height", "mass", "hair_color", "skin_color", "eye_color", "birth_year", "gender", "homeworld", "films", "species", "vehicles", "starships", "created", "edited", "url"}, {"name", "height", "mass", "hair_color", "skin_color", "eye_color", "birth_year", "gender", "homeworld", "films", "species", "vehicles", "starships", "created", "edited", "url"}),
+    #"Expanded Results.films" = Table.ExpandListColumn(#"Expanded results", "films"),
+    #"Expanded Results.species" = Table.ExpandListColumn(#"Expanded Results.films", "species"),
+    normalizedyearnull = Table.ReplaceValue(#"Expanded Results.species","unknown",null,Replacer.ReplaceValue,{"birth_year"}),
+    normalizedmassnull = Table.ReplaceValue(normalizedyearnull,"unknown",null,Replacer.ReplaceValue,{"mass"}),
+    normalizedheight = Table.ReplaceValue(normalizedmassnull,"unknown",null,Replacer.ReplaceValue,{"height"}),
+    removedbby = Table.ReplaceValue(normalizedheight,"BBY","",Replacer.ReplaceText,{"birth_year"}),
+    #"Expanded Results.vehicles" = Table.ExpandListColumn(removedbby, "vehicles"),
+    #"Expanded starships" = Table.ExpandListColumn(#"Expanded Results.vehicles", "starships"),
+    #"Changed Type" = Table.TransformColumnTypes(#"Expanded starships",{{"name", type text}, {"height", Int64.Type}, {"mass", Int64.Type}, {"hair_color", type text}, {"skin_color", type text}, {"eye_color", type text}, {"birth_year", type number}, {"gender", type text}, {"homeworld", type text}, {"films", type text}, {"species", type text}, {"vehicles", type text}, {"starships", type text}, {"created", type datetime}, {"edited", type datetime}, {"url", type text}}),
+    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"name", "Charactersname"}})
+in
+    #"Renamed Columns"
+	
+
+//Alfilms fact table
+
+let
+    Source = Json.Document(Web.Contents("https://swapi.dev/api/films/")),
+    #"Converted to Table" = Table.FromRecords({Source}),
+    #"Expanded results" = Table.ExpandListColumn(#"Converted to Table", "results"),
+    #"Expanded results1" = Table.ExpandRecordColumn(#"Expanded results", "results", {"title", "episode_id", "opening_crawl", "director", "producer", "release_date", "characters", "planets", "starships", "vehicles", "species", "created", "edited", "url"}, {"title", "episode_id", "opening_crawl", "director", "producer", "release_date", "characters", "planets", "starships", "vehicles", "species", "created", "edited", "url"}),
+    #"Changed Type" = Table.TransformColumnTypes(#"Expanded results1",{{"release_date", type date}, {"count", Int64.Type}, {"next", type any}, {"previous", type any}, {"title", type text}, {"episode_id", Int64.Type}, {"opening_crawl", type text}, {"director", type text}, {"producer", type text}, {"characters", type any}, {"planets", type any}, {"starships", type any}, {"vehicles", type any}, {"species", type any}, {"created", type datetime}, {"edited", type datetime}, {"url", type text}}),
+    #"Expanded characters" = Table.ExpandListColumn(#"Changed Type", "characters"),
+    #"Expanded planets" = Table.ExpandListColumn(#"Expanded characters", "planets"),
+    #"Expanded starships" = Table.ExpandListColumn(#"Expanded planets", "starships"),
+    #"Expanded vehicles" = Table.ExpandListColumn(#"Expanded starships", "vehicles"),
+    #"Expanded species" = Table.ExpandListColumn(#"Expanded vehicles", "species"),
+    #"Removed Columns" = Table.RemoveColumns(#"Expanded species",{"count", "next", "previous"}),
+    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"title", "Movie Title"}, {"director", "Director"}, {"producer", "Producer"}})
+in
+    #"Renamed Columns"
