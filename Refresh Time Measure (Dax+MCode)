@@ -1,4 +1,5 @@
-//Add Timestamp custom Column to your query to obtain latest refresh date and time
-=DateTime.AddZone(DateTime.FixedLocalNow(), -5)
-//then create a dax measure to show the max value of that update
+//Add Timestamp custom Column to your query to obtain latest refresh date and time // Use the value after the comma to set the right timezone that fits you
+
+=DateTime.AddZone(DateTime.FixedLocalNow(), -5) 
+//then create a dax measure to show the max value of that update //Be careful when loading to  the power bi service as the time defined by administrator my affect this formnula
 Latest Update = MAX('Your TAble'[Update Date])
