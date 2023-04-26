@@ -1,0 +1,4 @@
+//Add Timestamp custom Column to your query to obtain latest refresh date and time
+=DateTime.AddZone(DateTime.FixedLocalNow(), -5)
+//then create a dax measure to show the max value of that update
+Latest Update = MAX('Your TAble'[Update Date])
