@@ -1,0 +1,29 @@
+#Within Jupiter Notebook run the following code to import chat gpt 3.5 turbo to help you develop apps or whatever
+
+#define the pip installs in another notebook in this case I called the notebook install_packages.ipynb
+!pip install openai
+!pip install python-dotenv
+
+import openai
+import os
+
+os.environ['OPENAI_API_KEY'] = 'inputyourapikeyhere'
+
+from dotenv import load_dotenv, find_dotenv
+
+_ = load_dotenv(find_dotenv())
+
+openai.api_key = os.getenv('OPENAI_API_KEY')
+
+def get_completion(prompt, model="gpt-3.5-turbo"):
+    messages = [{"role": "user", "content": prompt}]
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=messages,
+        temperature=0, # this is the degree of randomness of the model's output
+    )
+    return response.choices[0].message["content"]
+prompt = "Help me write a simple fibonacci function"
+completion = get_completion(prompt)
+print(completion)
+
