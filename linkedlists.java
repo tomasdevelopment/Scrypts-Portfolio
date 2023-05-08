@@ -1,4 +1,3 @@
-package packetedoritos;
 
 import java.util.Arrays;
 
