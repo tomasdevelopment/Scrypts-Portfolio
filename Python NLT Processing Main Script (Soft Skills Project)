@@ -1,0 +1,259 @@
+import pandas as pd
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize, sent_tokenize
+from nltk.stem import WordNetLemmatizer
+from nltk.util import ngrams  # Add this line to import the ngrams function
+import re
+import langdetect
+from langdetect import detect
+from googletrans import Translator
+nltk.download('stopwords')
+nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('omw-1.4')  # Add this line to download the missing package
+
+def normalize(text):
+    text = re.sub(r'[^a-zA-Z0-9\s]', '', text)  # Modified to remove periods and other non-alphanumeric characters
+    text = text.lower()
+    text = re.sub(r'\s+', ' ', text)
+    return text
+
+
+def get_ngrams(words, n):
+    return [' '.join(grams) for grams in ngrams(words, n)]
+
+def extract_skills(text, skills):
+    stop_words = set(stopwords.words('english'))
+    tokenized_sentences = sent_tokenize(text)
+
+    found_skills = []
+    for sentence in tokenized_sentences:
+        tokenized_words = word_tokenize(sentence.lower())
+        tokenized_words = [word for word in tokenized_words if word.isalpha()]
+        tokenized_words = [word for word in tokenized_words if word not in stop_words]
+
+        bigrams = get_ngrams(tokenized_words, 2)
+        trigrams = get_ngrams(tokenized_words, 3)
+
+        lemmatized_words = lemmatize_words(tokenized_words)
+        lemmatized_bigrams = lemmatize_words(bigrams)
+        lemmatized_trigrams = lemmatize_words(trigrams)
+
+        all_grams = lemmatized_words + lemmatized_bigrams + lemmatized_trigrams
+
+        if any(substring in all_grams for substring in ['programming','programador', 'software', 'app', 'web', 'dev', 'developer', 'development', 'web development','object oriented programming']):
+            all_grams = [gram for gram in all_grams if gram not in ['programming','programador', 'software', 'app', 'web', 'dev', 'developer', 'development', 'web development','object oriented programming']]
+            all_grams.append('software developer')
+        if any(substring in all_grams for substring in ['data','data analyst', 'data analysis']):
+            all_grams = [gram for gram in all_grams if gram not in ['data','data analyst', 'data analysis']]
+            all_grams.append('data analyst')
+        for skill in skills:
+            if skill in all_grams:
+                found_skills.append(skill)
+
+    return found_skills
+
+def lemmatize_words(words):
+    lemmatizer = WordNetLemmatizer()
+    lemmatized_words = []
+    for word in words:
+        tokens = word.split(' ')
+        lemmatized_tokens = [lemmatizer.lemmatize(token) for token in tokens]
+        lemmatized_words.append(' '.join(lemmatized_tokens))
+    return lemmatized_words
+def translate_skills(skills, src_lang, dest_lang='en'):
+    translator = Translator(service_urls=['translate.google.com'])
+    translated_skills = []
+    for skill in skills:
+        translated_skill = translator.translate(skill, src=src_lang, dest=dest_lang).text
+        translated_skills.append(translated_skill)
+    return translated_skills
+
+
+soft_skills_seed_words = ["Confiable","Problem Solvers","Creative Thinkers","Communicative Skills","Communication", "Problem solving", "Stress management", "Organization", "Prioritizing", "Planning", "Verbal communication", "Presentation", "Constructive feedback", "Active listening", "Self management", "Optimism", "Calmness", "Analysis", "Self motivation", "Logical reasoning", "Observation", "Brainstorming", "Decision making", "Collaboration", "Coordination", "Idea exchange", "Mediation", "Imagination", "Mind mapping", "Innovation", "Experimentation", "Questioning", "Authenticity", "Mentorship", "Generosity", "Cultural intelligence", "Empathy", "Humor", "Networking", "Tolerance", "Diplomacy", "Responsibility", "Discipline", "Dependability", "Commitment", "Professionalism", "Scheduling", "Introspection", "Acuity", "Critical observation", "Customer service", "Listening skills", "Self control", "Positive attitude", "Assertiveness", "Conflict resolution", "Depersonalization", "Taking responsibility", "Positivity", "Work ethic", "Flexibility", "Confidence", "Receptive attitude", "Patience", "Enthusiasm", "Critical thinking", "Sociability", "Persuasion", "Visual communication", "Aesthetics", "Accuracy", "System analysis", "Deductive reasoning", "Active learning", "Quality client service", "Strategic thinking", "Technical writing", "Team building", "Presentation and public thinking", "Patience", "Open mindedness", "Accountability", "Time and project management", "Problem solving", "Critical thinking", "Decision making", "Analytical skills", "Innovation management", "Creativity and Innovation", "Adaptability and Flexibility", "Resourcefulness", "Troubleshooting", "Root cause analysis", "Logical reasoning", "Complex problem solving", "Systems thinking", "Design thinking", "Innovation strategy", "Strategic thinking", "Time management", "Project management", "Attention to detail", "Organization and planning", "Prioritization", "Goal setting", "Self discipline", "Perseverance and grit", "Resilience", "Stress management", "Emotional intelligence", "Empathy and compassion", "Conflict resolution", "Negotiation skills", "Persuasion", "Influence and persuasion", "Customer service", "Salesmanship", "Leadership", "Teamwork", "Collaboration", "Coordination", "Coaching and mentoring", "Teaching and instructing", "Facilitation", "Empowerment", "Delegation", "Feedback and coaching", "Trust building", "Relationship building", "Cultural competence", "Diversity and inclusion", "Respect for others", "Open mindedness", "Positive attitude", "Self awareness", "Self confidence", "Self motivation", "Self improvement", "Self management", "Passion for work", "Initiative taking", "Curiosity and learning", "Adaptation to change", "Risk taking", "Entrepreneurship", "Continuous improvement", "Innovation culture", "Interpersonal communication", "Verbal communication", "Nonverbal communication","Presentation skills", "Public speaking", "Active listening", "Conflict management", "Time management", "Customer focus", "Service orientation", "Team building", "Coaching and feedback", "Multitasking", "Decision making"]
+soft_skills_seed_words = list(set(soft_skills_seed_words))
+hard_skills_seed_words = [
+    "Written communication",
+    "Python",
+    "Java",
+    "Excel",
+    "Data analysis",
+    "Project management",
+    "Data visualization",
+    "Machine learning",
+    "SQL",
+    "Database management",
+    "Statistical analysis",
+    "Business intelligence",
+    "Data mining",
+    "Data modeling",
+    "Data management",
+    "Data cleaning",
+    "Data warehousing",
+    "Data architecture",
+    "Predictive modeling",
+    "Data driven decision making",
+    "Software development",
+    "Programming languages",
+    "Object oriented programming",
+    "Software development","Software Developer",
+    "Front end development",
+    "Back end development",
+    "Full stack development",
+    "Mobile development",
+    "iOS development",
+    "Android development",
+    "Cloud computing",
+    "Network security",
+    "Information security",
+    "Cybersecurity",
+    "DevOps",
+    "Agile methodology",
+    "Scrum",
+    "Kanban",
+    "Waterfall methodology",
+    "Test driven development",
+    "Continuous integration",
+    "Continuous delivery",
+    "Git",
+    "Version control",
+    "Quality assurance",
+    "User experience design",
+    "User interface design",
+    "Graphic design",
+    "Search engine optimization",
+    "Digital marketing",
+    "Content management systems",
+    "Big data",
+    "Artificial intelligence",
+    "Natural language processing",
+    "Computer vision",
+    "Blockchain technology",
+    "Internet of things",
+    "Cloud architecture",
+    "Cloud storage",
+    "Cloud security",
+    "Data privacy",
+    "Data encryption",
+    "Data forensics",
+    "Network architecture",
+    "Virtualization technology",
+    "Server administration",
+    "IT infrastructure",
+    "Information governance",
+    "Project planning",
+    "Project scheduling",
+    "Project coordination",
+    "Resource management",
+    "Risk management",
+    "Business analysis",
+    "Requirements gathering",
+    "Product management",
+    "Product development",
+    "Product launch",
+    "Market research",
+    "Sales forecasting",
+    "Financial analysis",
+    "Financial planning",
+    "Financial reporting",
+    "Investment analysis",
+    "Investment management",
+    "Asset management",
+    "Asset allocation",
+    "Tax planning",
+    "Auditing",
+    "Accounting software",
+    "Account reconciliation",
+    "Bookkeeping",
+    "Payroll administration",
+    "Accounts payable",
+    "Accounts receivable",
+    "Cost accounting",
+    "Managerial accounting",
+    "Business law",
+    "Employment law",
+    "Intellectual property law",
+    "Contract negotiation",
+    "Procurement",
+    "Supply chain management",
+    "Logistics management",
+    "Inventory management",
+    "Distribution management",
+    "Customer relationship management",
+    "Sales management",
+    "Sales operations",
+    "Sales strategy",
+    "Sales enablement",
+    "Lead generation",
+    "Lead nurturing",
+    "Customer support",
+    "Customer service management",
+    "Call center management",
+    "Technical support",
+    "Field service management",
+    "Operations management",
+    "Process improvement",
+    "Quality management",
+    "Lean six sigma",
+    "Business process reengineering",
+    "Facilities management",
+    "Real estate management",
+    "Property management","Soporte Tecnico",
+    "Construction management","Ecommerce","Financial","Sales","developer","data","commerce","branding","architect","business professional","Business development","Staffing","Programming developer",
+]
+hard_skills_seed_words = list(set(hard_skills_seed_words))
+soft_skills_seed_words = list(set(soft_skills_seed_words))
+length_difference = len(hard_skills_seed_words) - len(soft_skills_seed_words)
+
+if length_difference > 0:
+	additional_soft_skills = ["Sensitivity", "Determination", "Perceptiveness", "Self-regulation", "Team player", "Proactivity", "Goal oriented", "Adaptable", "Compassionate", 	"Diligent", "Ambitious", "Reliable", "Integrity", "Pragmatic", "Intuitive", "Strategic", "Focused", "Efficient", "Analytical", "Resourceful", "Respectful", "Responsive", 	"Versatile", "Inquisitive", "Objective", "Sincere", "Energetic", "Persuasive", "Tactful", "Attentive", "Inventive", "Initiative", "Consistency", "Humility", "Responsible", 	"Punctuality", "Courage", "Influential", "Vigilance", "Perceptive", "Loyalty", "Resolute", "Self-starter", "Detail-oriented", "Foresight", "Honesty", "Tenacity", 	"Discernment", "Practical", "Self-sufficient", "Intelligent", "Agile", "Independent", "Creative", "Solution oriented", "Multicultural awareness", "Composure", "Diplomatic", 	"Adaptive", "Consistent", "Enterprising", "Problem identifier", "Risk-aware", "Curious", "Articulate", "Initiator", "Gracious", "Innovative", "Good judgment", "Strategist", 	"Cooperative", "Supportive", "Perseverant", "Direct", "Transparent", "Reflective", "Dedicated", "Good listener", "Empathetic", "Trustworthy", "Decisive", "Motivated", 	"Professional", "Proactive", "Ethical", "Methodical", "Conscientious", "Assertive", "Growth mindset", "Courageous", "Collaborative", "Approachable", "Fair", "Organized", 	"Self-aware", "Self-directed", "Visionary", "Enthusiastic", "Humble", "Rational", "Inclusive", "Persistent", "Driven", "Charismatic", "Results oriented", "Credible", 	"Genuine", "Realistic", "Grounded", "Prudent", "Sensible", "Self assured", "Tolerant", "Appreciative", "Curiosity", "Persistence", "Initiative", "Imaginative", 	"Anticipatory", "Strategic thinking", "Inspiring", "Flexible"]
+	soft_skills_seed_words.extend(additional_soft_skills[:length_difference])
+else:
+	additional_hard_skills = ["Machine Learning Engineer", "UI/UX Designer", "Data Scientist", "Web Developer", "Mobile App Developer", "Data Analyst", "Network Administrator", 	"Security Analyst", "Cloud Architect", "Systems Analyst", "Database Administrator", "IT Support Specialist", "Technical Writer", "IT Project Manager", "SEO Specialist", 	"Social Media Manager", "Content Creator", "Game Developer", "Augmented Reality Developer", "Virtual Reality Developer", "Digital Marketing Manager", "Automation Engineer", 	"Business Analyst", "IT Consultant", "Sales Engineer", "DevOps Engineer", "Data Engineer", "Ethical Hacker", "Embedded Systems Engineer", "Product Designer", "RPA 	Developer", "AI Developer", "Computer Vision Engineer"]
+
+# Normalize hard skill seed words
+normalized_seed_words = [normalize(word) for word in soft_skills_seed_words]
+normalized_hard_skills_seed_words = [normalize(word) for word in hard_skills_seed_words]
+if len(set(normalized_seed_words)) != len(normalized_seed_words):
+    print("Warning: There are repeated words in the soft_skills list.")
+if len(set(normalized_hard_skills_seed_words)) != len(normalized_hard_skills_seed_words):
+    print("Warning: There are repeated words in the hard_skills list.")
+
+
+def detect_language(text):
+    try:
+        return detect(text)
+    except:
+        return "unknown"
+
+
+def process_data(dataset, soft_skills, hard_skills):
+    dataset['results.description'] = dataset['results.description'].apply(normalize)
+    dataset['found_soft_skills'] = dataset['results.description'].apply(lambda x: extract_skills(x, soft_skills))
+    dataset['found_hard_skills'] = dataset['results.description'].apply(lambda x: extract_skills(x, hard_skills))
+    dataset['language'] = dataset['results.description'].apply(detect_language)
+
+    # Translate the extracted skills if the language is not English
+    for index, row in dataset.iterrows():
+        if row['language'] != 'es':
+            translated_soft_skills = translate_skills(row['found_soft_skills'], 'en', dest_lang='es')
+            translated_hard_skills = translate_skills(row['found_hard_skills'], 'en', dest_lang='es')
+            dataset.at[index, 'found_soft_skills'] = translated_soft_skills
+            dataset.at[index, 'found_hard_skills'] = translated_hard_skills
+
+    return dataset
+
+
+your_dataframe = dataset  # <- Replace this line with your actual DataFrame
+
+
+
+
+# Process the data to extract soft skills
+processed_df = process_data(your_dataframe, normalized_seed_words, normalized_hard_skills_seed_words)
+
+
+# Return the new dataframe with the additional column
+print(processed_df)
+

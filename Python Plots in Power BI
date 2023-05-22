@@ -1,0 +1,37 @@
+#python visual 1 satter make sure to use at least two columns for it to work. #This was used on the article analisis de las habilidades blandas mas demanadadas
+##use this visuals within the power Bi editor graphics to produce scatter plot
+import matplotlib.pyplot as plt
+
+sorted_dataset = dataset.sort_values('SalarioPromedio', ascending=True)
+
+# Set the size of the plot
+fig, ax = plt.subplots(figsize=(12, 6))
+
+# Set the color of the plot
+ax.scatter(sorted_dataset['SalarioPromedio'], dataset['SoftSkill'], label='Soft Skills', color='green')
+
+ax.set_xlabel('Soft Skill')
+ax.set_ylabel('Matching Skills')
+ax.set_title('Salario Promedio Según Soft Skill')
+ax.legend()
+
+plt.show()
+
+##use this visual to produce scatter plots and bar charts for the values selected in power ib
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Set the style and font scale
+sns.set(style="ticks", font_scale=1.5, color_codes=True)
+
+# Create a pastel color palette
+pastel_palette = sns.color_palette("pastel")
+
+# Create the pairplot with the specified palette and font size
+g = sns.pairplot(dataset, palette=pastel_palette, height=2.5)
+
+# Increase the title font size
+g.fig.subplots_adjust(top=0.9)
+g.fig.suptitle("Company Distribution of Soft and Hard Skill Matches", fontsize=15)
+
+plt.show()
