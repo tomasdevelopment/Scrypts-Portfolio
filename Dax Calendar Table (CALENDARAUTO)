@@ -1,0 +1,22 @@
+//*Use this dax to create a calendar table from scratch
+[Calendar] is a cool value that is generated out of the Calendarauto() calculated table*//
+
+Dax Calendar Table  = 
+VAR Minyear = YEAR(MIN('Calendar'[Transaction_Date]))
+VAR Maxyear = YEAR(MAX('Calendar'[Transaction_Date]))
+
+VAR AutoCalendar = ADDCOLUMNS(
+    FILTER(
+        CALENDARAUTO(),
+        YEAR([Date]) >= Minyear && //the date was generated from calendar auto
+        YEAR([Date]) <= Maxyear
+    ),
+    "Year", YEAR([Date]),
+    "Quarter Number: ", INT(FORMAT([Date],"Q")),
+    "Month Number",FORMAT([Date],"mmm"),
+    "Week Number", WEEKNUM([Date]))
+RETURN 
+AutoCalendar
+
+
+
