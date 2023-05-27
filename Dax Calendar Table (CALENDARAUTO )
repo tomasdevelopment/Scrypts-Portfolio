@@ -18,5 +18,13 @@ VAR AutoCalendar = ADDCOLUMNS(
 RETURN 
 AutoCalendar
 
+//  The version below is simpler, use ctrl ctrl u to remove all comments
 
-
+// DateTable = ADDCOLUMNS(CALENDARAUTO(),
+// "Month", MONTH([Date]),
+// "Month Name", FORMAT([Date],"MMMM"),
+// "Quarter", QUARTER([Date]),
+// "Year", YEAR([Date]),
+// "Day", DAY([Date]),
+// "WeekDayNum",WEEKDAY([Date]),
+// "WeekdayName", FORMAT([Date],"DDDD"))
