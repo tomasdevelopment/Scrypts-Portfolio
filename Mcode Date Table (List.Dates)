@@ -1,6 +1,7 @@
 //Mcode Table, define the start point after # date
 //Define the number of years you want to have after the second comma 365*5 equals 5 years
-//Define the duration interval, (1,hours,minutes,seconds) will filter by days
+//Define the duration interval, (Days,hours,minutes,seconds) will filter by days,
+//Remember to conver the list into tables and add additional columns adding date columns
 
 //5 years in days interval
 = List.Dates(#date(2017,01,01),365*5,#duration(1,0,0,0))
