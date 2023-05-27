@@ -1,0 +1,15 @@
+//Mcode Table, define the start point after # date
+//Define the number of years you want to have after the second comma 365*5 equals 5 years
+//Define the duration interval, (1,0,0,0) will filter by days
+
+//5 years in days interval
+= List.Dates(#date(2017,01,01),365*5,#duration(1,0,0,0))
+
+//5 Years in years interval
+= List.Dates(#date(2017,01,01),5,#duration(365,0,0,0))
+
+// 5 years in months intervals, 12 months in a year, so 60 dates would represent 5 years (60 / 12 = 5)
+=List.Dates(#date(2017,01,01),60,#duration(30,0,0,0))
+
+// 5 years in weeks intervals (=260 / 52 = 5) 52 weeks approximately in year
+= List.Dates(#date(2017,01,01),260,#duration(7,0,0,0)) 
