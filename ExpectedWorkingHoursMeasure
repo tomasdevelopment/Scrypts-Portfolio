@@ -1,0 +1,14 @@
+// use this in a gauge or card in a report page where you have a date slicer filtering most of the visuals, this will give you an adjustable expected hours metric
+Working Hours = 
+    var start_date = MIN(CalendarTable[Date])
+    var end_date = MAX(CalendarTable[Date])
+    var total_days = 
+        CALCULATE(  
+            COUNTROWS(CalendarTable),
+            FILTER(
+                ALL(CalendarTable),
+                CalendarTable[Date] >= start_date && CalendarTable[Date] <= end_date &&
+                WEEKDAY(CalendarTable[Date], 2) < 6 //Exclude Saturday and Sunday
+            )
+        )
+return total_days * 8
