@@ -1,0 +1,1 @@
+OT Hours Grand Total = CALCULATE(SUMX(VALUES('Hours data base'[Workcode]),[Hours sum]),FILTER('Hours data base','Hours data base'[Task Workcode]=="OT"))
