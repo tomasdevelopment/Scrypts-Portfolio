@@ -1,0 +1,45 @@
+/* Use this to select between two formulas in case the filter context is complicated
+
+Use switch if you wanna be fancy, but a simple if can make it too
+*/
+
+MTD HC Switched = 
+SWITCH(
+    TRUE(),
+    ISBLANK(
+        CALCULATE(
+            [Current HC],
+            DATESMTD(ENDOFMONTH(dateadd('Headcount Query'[HC Date], -1, MONTH)))
+        )
+    ),
+    CALCULATE(
+        [Current HC],
+        DATESMTD(ENDOFMONTH(dateadd('Rolling Calendar'[Full Date], -1, MONTH))),
+        ALL('Rolling Calendar')
+    ),
+    CALCULATE(
+        [Current HC],
+        DATESMTD(ENDOFMONTH(dateadd('Headcount Query'[HC Date], -1, MONTH)))
+    )
+)
+
+/* if version
+MTD HC = 
+IF(
+    ISBLANK(
+        CALCULATE(
+            [Current HC],
+            DATESMTD(ENDOFMONTH(dateadd('Forecast Query'[HC Date], -1, MONTH)))
+        )
+    ),
+   CALCULATE(
+    [Current HC],
+    DATESMTD(ENDOFMONTH(dateadd('Rolling Calendar'[Full Date], -1, MONTH))),
+    ALL('Rolling Calendar')
+
+    ),
+    CALCULATE(
+        [Current HC],
+        DATESMTD(ENDOFMONTH(dateadd('Forecast Query'[Forecast Date], -1, MONTH)))
+    )
+)* 
