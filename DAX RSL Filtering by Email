@@ -1,0 +1,8 @@
+/*create an RLs table, I used sharepoint to load it but you can also create it from scratch in query
+Once you have it created, connect it many to many or one to many to the table you want to filter, by the Key value you want to filter
+you can add seveeral rows for each employee if you are looking to  allow several brand identificators like this scenario*/
+
+//add this under Modeling Manage Roles 
+[Brand Identificator] in CALCULATETABLE(VALUES(rls[Brand Identificator]), rls[EMAIL] = USERPRINCIPALNAME())
+
+
