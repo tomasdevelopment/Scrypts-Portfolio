@@ -1,0 +1,18 @@
+//if you are tired of using query and want to try a different way to load you data or create a dimension data but need some specific conditional columns, try this to create a conditional column based on string values
+
+Position Level Category = 
+VAR Position = 'Positions Dimension'[Company Position]
+RETURN
+    IF(
+        CONTAINSSTRING(Position, "Level10"),
+        10,
+        IF(
+            CONTAINSSTRING(Position, "Level9"),
+            9,
+            IF(
+                CONTAINSSTRING(Position, "Level8"),
+                8,
+                0
+            )
+        )
+    )
