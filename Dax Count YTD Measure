@@ -1,0 +1,11 @@
+Total Leaves by Client YTD = 
+IF(
+    MAX('Leaves CalendarTable'[Date]) <= TODAY(),
+    TOTALYTD(
+        [Total Leaves],
+        'Leaves CalendarTable'[Date]
+    )
+)
+
+//this gives you a ytd that its perfect to add in line charts to create a fc
+// the total Leaves measure is simply a count rows of the table where the leaves data is allocated CALCULATE(COUNTROWS(leavesdata))
