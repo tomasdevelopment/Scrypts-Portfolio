@@ -1,5 +1,5 @@
 //use this to get a rolling table always 2 months ahead of today
-Rolling Dax calendar Leaves CalendarTable = 
+Rolling Dax calendar  CalendarTable = 
 CALENDAR(
 DATE(2020,1,1), DATE(YEAR(TODAY()),MONTH(TODAY()),DAY(TODAY())+60 )
 )
