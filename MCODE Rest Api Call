@@ -1,0 +1,9 @@
+/* this is what you will get if you load from web, notice that you will need to check with your api providers to make sure authentication matches power bi service credential authentication options
+I recommend that you make sure your rest api providers do not  use headers as authetnication but use the token within the same link as shown in the example url */
+let
+    Source = Json.Document(Web.Contents("https://yourwebsite.azurewetsites.net/source/interfaceproject/projectname?token=yourapikeyhere")),
+    #"Converted to Table" = Table.FromRecords({Source}),
+    #"Expanded data" = Table.ExpandListColumn(#"Converted to Table", "data"),
+   #"Expanded data1" = Table.ExpandRecordColumn(#"Expanded data", "data", {"data", "clientname", "client email", "date submitted"})
+in
+    #"Expanded data1"
