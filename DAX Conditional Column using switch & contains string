@@ -1,0 +1,9 @@
+//if you need to filter your data based on words found in your text
+
+Conditional Text Column Based on   = 
+VAR Clients = Reports[ClientsColumn]
+RETURN
+ SWITCH(TRUE(),
+        CONTAINSSTRING(ClientsColumn, "Github"),
+        "Geek","Regular guy"    
+)
