@@ -1,0 +1,13 @@
+//add as a custom column step in query
+//in this scenario the week ending date column ended on a Friday, so we added the rest of the dates based on a day name column, modify according to the eow date you get
+
+if [DayofWeek] = "Saturday" then [Week END] + #duration(1,0,0,0) 
+else if [DayofWeek] = "Sunday" then [Week END] + #duration(2,0,0,0) 
+else if [DayofWeek] = "Friday" then [Week END] 
+
+else if [DayofWeek] = "Thursday" then [Week END] - #duration(1,0,0,0) 
+ else if [DayofWeek] = "Wednesday" then [Week END] - #duration(2,0,0,0) 
+   else if [DayofWeek] = "Tuesday" then [Week END] - #duration(3,0,0,0) 
+   else if [DayofWeek] = "Monday" then [Week END] - #duration(4,0,0,0) 
+  
+  else "Error"
