@@ -1,0 +1,16 @@
+//sometimes creating bridge dimensions with dax can endup un the report performing better than creating bridge queries
+
+Names Dimension = 
+DISTINCT(
+    UNION(
+        FILTER(
+            VALUES('Employee Data'[Name]), 
+            NOT(ISBLANK('Employee Data'[Name]))
+        ),
+        FILTER(
+            VALUES('Other Data Base'[Name]), 
+            NOT(ISBLANK('Other Data Base'[Name])
+        )
+    )
+)
+)
