@@ -1,0 +1,5 @@
+Max Date Available in DB = CALCULATE(MAX(Database[Date]),ALL(Database))
+or
+Min Date Available in DB = CALCULATE(Min(Database[Date]),ALL(Database))
+
+//this gives users a good perspective of the data they can find in the report
