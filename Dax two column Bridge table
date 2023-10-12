@@ -1,0 +1,21 @@
+Dimension IDS = 
+DISTINCT(
+    UNION(
+        SELECTCOLUMNS(
+            FILTER(
+                MasterForm,
+                NOT(ISBLANK(MasterForm[Email]))
+            ),
+            "Email", MasterForm[Email],
+            "Name", MasterForm[Name]
+        ),
+        SELECTCOLUMNS(
+            FILTER(
+                Othertable,
+                NOT(ISBLANK(Othertable[Correo electrónico]))
+            ),
+            "Email", Othertbale[Email],
+            "Name",Othertable[Name])
+        )
+    )
+)
