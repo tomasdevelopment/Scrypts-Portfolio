@@ -1,0 +1,15 @@
+Monthly_Duration_Avg = 
+AVERAGEX(
+    FILTER(
+        HCBASE,
+        NOT(ISBLANK(HCBASE[StartDate])) &&
+        NOT(ISBLANK(HCBASE[LastDay]))
+    ),
+    DATEDIFF(
+        HCBASE[StartDate],
+        HCBASE[LastDay],
+        MONTH
+    )
+)
+/* This help you calculate a difference of dates,  in this case for the average duration of an 
+employee in the company*/
