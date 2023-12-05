@@ -10,10 +10,58 @@ def get_user_profile(access_token):
         return None
 
 # Replace 'YOUR_INSTAGRAM_ACCESS_TOKEN' with your actual Instagram access token.
-access_token = 'IGQWRQVkF2UkpnRUozbmw4RUtuLU04TFhEeF9HaWhMOE9TQXlHMGRxeWIyNGFYa1RlT19qRFFQYXFvY2lUeVF2TWRMdTFPb1VUS1R2ZAkpKRzBBV2U1eVgxMEM5ZADJtYzFOOEhtUDhOS2lwWXFjNmIxRGRCdkVOZAzgZD'
+access_token = 'yourapihere'
 user_profile = get_user_profile(access_token)
 
 if user_profile:
     print("User Profile:", user_profile)
 else:
     print("Unable to get user profile.")
+
+#Now use this to get media
+#info to get posts
+import pandas as pd
+from datetime import datetime #for the datetimefetching
+
+def get_user_media(access_token, user_id):
+   # url = f"https://graph.instagram.com/{user_id}/media?fields=id,caption&access_token={access_token}"
+   #    url = f"https://graph.instagram.com/{user_id}/media?fields=id,caption,media_type,media_url,timestamp&access_token={access_token}"
+
+    url = "https://graph.instagram.com/{user_id}/media?fields=id,caption,media_type,media_url,timestamp&access_token={access_token}".format(user_id=user_id,access_token=access_token)
+
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        print("Error in getting user media:", response.json())
+        return None
+# Assuming you have the user ID from the user profile
+user_id = user_profile.get('id')
+user_media = get_user_media(access_token, user_id)
+
+if user_media:
+    print("User Media:", user_media)
+else:
+    print("Unable to get user media.")
+##Data analysis
+type(user_media)
+media_data = user_media['data']
+pd.Series(media_data)
+
+df = pd.DataFrame(media_data)
+
+#Sorting the df timestamp
+#conver timestamp to date time format
+df['timestamp'] = pd.to_datetime(df['timestamp'])
+#create a data frame where the values are sorted
+df_sorted = df.sort_values(by='timestamp', ascending=True) #Menor a mayor
+
+#exporting to csv on the same cloud 
+file_path = 'myinsta.csv'
+file_path2 =r'C:\Users\tomsu\OneDrive\Escritorio\myinsta.csv'
+
+
+# Write the DataFrame to a CSV file
+df.to_csv(file_path2, index=True)
+df_sorted
+user_id
