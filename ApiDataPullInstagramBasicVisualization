@@ -1,0 +1,19 @@
+import requests
+##use this to get info from the profile
+def get_user_profile(access_token):
+    url = f"https://graph.instagram.com/me?fields=id,username&access_token={access_token}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        print("Error:", response.json())
+        return None
+
+# Replace 'YOUR_INSTAGRAM_ACCESS_TOKEN' with your actual Instagram access token.
+access_token = 'IGQWRQVkF2UkpnRUozbmw4RUtuLU04TFhEeF9HaWhMOE9TQXlHMGRxeWIyNGFYa1RlT19qRFFQYXFvY2lUeVF2TWRMdTFPb1VUS1R2ZAkpKRzBBV2U1eVgxMEM5ZADJtYzFOOEhtUDhOS2lwWXFjNmIxRGRCdkVOZAzgZD'
+user_profile = get_user_profile(access_token)
+
+if user_profile:
+    print("User Profile:", user_profile)
+else:
+    print("Unable to get user profile.")
