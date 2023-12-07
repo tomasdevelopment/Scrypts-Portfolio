@@ -1,0 +1,20 @@
+import pandas as pd
+url = 'urlandapitoken'
+try:
+    df = pd.read_json(url)
+    print('data feteched succesfully \n',df.head(3))
+  #  print(df['data'].head(2)) # you can see here the data is trapped in data
+   # print(df.drop(columns='data')) # this would remove the data column
+    details_dfs = df['data'].apply(pd.json_normalize) #it seems as if the columns had repeated all around
+    print('data normalized succesfully \n','\n',type(details_dfs))
+    normalizeddf = pd.concat(details_dfs.tolist(),ignore_index=True)
+    print('data concatenated succesfully \n',normalizeddf.head(3),'\n',type(normalizeddf))
+    
+    #Optional
+    #df.drop(columns=['data']) remove the data colum as it has already been expaned
+    #normalized_df = pd.concat([df,details_df],axis=1)
+
+except  Exception as z:
+    print("An error ocurred {0}".format(z))
+    #print(f"anerrorocurred{e}")
+    #print("anerrorocurred {error}.format(error=z))
