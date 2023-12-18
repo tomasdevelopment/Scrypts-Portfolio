@@ -1,0 +1,54 @@
+import requests ## To use with multiple access token
+import json
+
+# Your app ID and client secret
+app_id = 'clientorappid'
+client_secret = 'clientsecretafterapphasbeencreated'
+redirect_uri = 'yourwebsitecallbackserver'
+
+# Headers
+headers = {
+    'Content-Type': 'application/json'
+}
+
+# First auth_code
+auth_code1=''
+#second auth
+auth_code2 = 'LSR0XjjtEe6Z5rwbVPBjq5nlouSd-YAo6-gOjA-2jf5b4VRdsJKxGjBg2StHjN9No5AV1vLpadhjo7bY1LmrhpVqcAyeJ2xuL5-PI-jT1qVkfohr1CGREtpIdwMabATjQEtKd5ysTEX6Dm-Hau0-dAvGTmyvdhMQBzw64KFt_yuiCnPodp_MUVrb1T6ZABmmMPUi18-o55Y1YT-DhKNkW7DVf8ELZp4d3OW9X_3_0RA%2A2%214626'  # Replace with your actual second auth_code
+
+# Function to get access token
+def get_access_token(auth_code):
+    payload = {
+        'client_id': app_id,
+        'client_secret': client_secret,
+        'grant_type': 'authorization_code',
+        'auth_code': auth_code,
+        'redirect_uri': redirect_uri
+    }
+
+    # Token endpoint
+    url = 'https://business-api.tiktok.com/open_api/v1.3/tt_user/oauth2/token/'
+
+    # Making the POST request
+    response = requests.post(url, headers=headers, data=json.dumps(payload))
+
+    # Checking the response
+    if response.status_code == 200:
+        # If the request was successful, process the response
+        data = response.json()
+        print("Access token for auth_code:", auth_code)
+        print("Response Data:", data)
+        return data.get('data', {}).get('access_token')
+    else:
+        # If the request failed, print the status code and response
+        print("Failed to fetch token info for auth_code:", auth_code)
+        print("Status Code:", response.status_code, "Response:", response.text)
+        return None
+
+# Get first access token
+access_token1 = get_access_token(auth_code1)
+
+# Get second access token
+access_token2 = get_access_token(auth_code2)
+
+# Now you have two access tokens, `access_token1` and `access_token2`
