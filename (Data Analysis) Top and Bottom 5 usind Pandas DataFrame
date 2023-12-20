@@ -1,0 +1,7 @@
+#to get them in descending order #create a top 5 bottom 5 list using pandas
+top5=google.sort_values(ascending=False).head() #from larger to smaller #top 5
+bottom5 = google.sort_values(ascending=False).tail()
+topandbottom = pd.DataFrame({"Top5":top5.values,
+                             "bottom5":bottom5.values
+                            })
+print(topandbottom)
