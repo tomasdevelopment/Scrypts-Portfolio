@@ -1,0 +1,37 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Load the data
+pokemon = pd.read_csv('CSV/Pokemon.csv', index_col=['Name']).squeeze('columns')
+
+# Calculate value counts and assign column names
+Count_df = pokemon.value_counts().reset_index(name='Count')
+Count_df.columns = ['Type', 'Count']
+
+# Calculate the total count from the original dataset
+total_count = Count_df['Count'].sum()
+
+# Select the top 10 and bottom 10
+top10 = Count_df.head(10)
+bottom10 = Count_df.tail(10)
+
+# Plot for top 10 Pokemon Types
+plt.figure(figsize=(30,30))
+patches, texts, autotexts = plt.pie(top10['Count'], labels=top10['Type'], autopct=lambda p: '{:.1f}%'.format(p * top10['Count'].sum() / total_count))
+plt.setp(autotexts, size=20, weight="bold")
+plt.setp(texts, size=20)
+plt.title('Top 10 Pokemon Categories', fontsize=24)
+plt.show()
+
+# Plot for bottom 10 Pokemon Types
+plt.figure(figsize=(15,15))
+patches, text, autotext = plt.pie(bottom10['Count'], labels=bottom10['Type'], autopct=lambda p: '{:.1f}%'.format(p * bottom10['Count'].sum() / total_count))
+
+# Adjust the size and weight of the pie chart text
+plt.setp(autotext, size=20, weight='bold')
+plt.setp(text, size=20)
+
+# Display the plot
+plt.show()
+Count_df['Count'].sum()
+Count_df.to_excel(r'C:\Users\tomsu\OneDrive\Escritorio\AccessAnalytics\pokemon.xlsx', index=False)
