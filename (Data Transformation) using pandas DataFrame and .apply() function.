@@ -1,0 +1,8 @@
+#apply method, applies a function to all the series
+pokemon = pd.read_csv('CSV/pokemon.csv',usecols =['Name']).squeeze('columns')
+pokemon2 = pokemon.copy().apply(len)
+
+dataframepk = pd.DataFrame({"Pokemon":pokemon,
+                           "Pokemoncountletters":pokemon2
+                           })
+dataframepk
