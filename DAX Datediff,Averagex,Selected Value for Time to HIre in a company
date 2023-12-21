@@ -1,0 +1,26 @@
+
+
+//average date diff to get a number of days between the position created and actual start date
+Time to Hire = DATEDIFF( 
+    MAX(hiresdatabase[positionCreated]),
+    MAX(hiresdatabase[ActualStartDate]),
+    DAY
+)
+
+//average x, date difference average x to be able to use it in matrix by teams
+AverageTimeToHire = 
+AVERAGEX(
+    hiresdatabase,
+    DATEDIFF(
+        hiresdatabase[positionCreated],
+        hiresdatabase[ActualStartDate],
+        DAY
+    )
+)
+// Generate alert in case dates are incorrectly input
+Alert_ActualStartDate = 
+IF(
+    SELECTEDVALUE(hiresdatabase[positionCreated]) < SELECTEDVALUE(hiresdatabase[ActualStartDate]) && NOT(ISBLANK(SELECTEDVALUE(hiresdatabase[ActualStartDate]))),
+    "Alert, position created is after start date",
+    "Ok"
+)
