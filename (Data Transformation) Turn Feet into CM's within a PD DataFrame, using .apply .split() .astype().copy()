@@ -1,0 +1,14 @@
+nba=pd.read_csv("CSV/nba.csv")
+
+#TURN IT TO CMS change a column value
+def height_to_inches(Height):
+    if pd.isna(Height):
+        return None
+    Height = str(Height)
+    feet, inches = Height.split("-")
+    total_inches = int(feet) *12+int(inches) #ALL TO INCHES
+    return total_inches*2.54 #INCHES TO CM
+nba2 = nba.copy()
+
+nba2['Height'] = nba2['Height'].apply(height_to_inches).astype(float) #apply conversion and turn it into float valeues
+nba2.sort_values(by="Height",ascending=True) #from smallest to largest
