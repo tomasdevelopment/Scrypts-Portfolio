@@ -1,7 +1,16 @@
 #to get them in descending order #create a top 5 bottom 5 list using pandas
+#if you start out with a series
 top5=google.sort_values(ascending=False).head() #from larger to smaller #top 5
 bottom5 = google.sort_values(ascending=False).tail()
 topandbottom = pd.DataFrame({"Top5":top5.values,
                              "bottom5":bottom5.values
                             })
 print(topandbottom)
+
+
+#if you startout with two dataframes that you want to joing you will have to reset index
+richandpoor = nba2['Category Salary'] =nba2['Salary'].sort_values().map(Salary_Group)
+top5riches = nba2.head()
+bottom5riches = nba2.tail()
+DFNBARICH = pd.DataFrame({'Top 5':top5riches['Salary'].reset_index(drop=True),
+            'Bottom 5':bottom5riches['Salary'].reset_index(drop=True)})
