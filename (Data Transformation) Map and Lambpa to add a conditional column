@@ -1,0 +1,7 @@
+#MAP examples adding a conditional column 
+nba=pd.read_csv("CSV/nba.csv")
+nba2- nba.copy()
+Salary_Group = lambda x: 'Lowincome' if x<50000 else 'Highincome'
+
+Wealth_Category = nba2['Category Salary'] =nba2['Salary'].sort_values().map(Salary_Group) #sort and create the new conditional column
+nba2
