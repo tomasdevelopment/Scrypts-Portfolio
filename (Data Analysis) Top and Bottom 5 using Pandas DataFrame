@@ -1,12 +1,24 @@
-#to get them in descending order #create a top 5 bottom 5 list using pandas
-#in this example you have two data frames that want to join
-#if you start out with a data frame
-top5=google.sort_values(ascending=False).head() #from larger to smaller #top 5
-bottom5 = google.sort_values(ascending=False).tail()
-topandbottom = pd.DataFrame({"Top5":top5.values,
-                             "bottom5":bottom5.values
-                            })
+import pandas as pd
+
+# Load the data
+google = pd.read_csv('CSV/google_stock_price.csv')
+
+# Get the top and bottom 5 rows based on Price
+top5 = google.nlargest(5, 'Price')
+bottom5 = google.nsmallest(5, 'Price')
+
+# Reset the index if you want to keep the data aligned correctly
+top5.reset_index(drop=True, inplace=True)
+bottom5.reset_index(drop=True, inplace=True)
+
+# Create a DataFrame with the top and bottom 5 prices side by side
+topandbottom = pd.DataFrame({
+    "Top5 Prices": top5['Price'],
+    "Bottom5 Prices": bottom5['Price']
+})
+
 print(topandbottom)
+
 
 
 #if you startout with two Series that you want to joing you will have to reset index
