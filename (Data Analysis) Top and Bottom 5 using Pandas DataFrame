@@ -1,6 +1,8 @@
 #to get them in descending order #create a top 5 bottom 5 list using pandas
 #in this example you have two data frames that want to join
-#if you start out with a series
+#if you start out with a data frame
+#add a rank to make it even more granualr
+google['Price Rank'] = google['Price'].rank(ascending=False).astype(float)
 top5=google.sort_values(ascending=False).head() #from larger to smaller #top 5
 bottom5 = google.sort_values(ascending=False).tail()
 topandbottom = pd.DataFrame({"Top5":top5.values,
