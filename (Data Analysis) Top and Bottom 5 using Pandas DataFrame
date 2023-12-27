@@ -1,4 +1,5 @@
 #to get them in descending order #create a top 5 bottom 5 list using pandas
+#in this example you have two data frames that want to join
 #if you start out with a series
 top5=google.sort_values(ascending=False).head() #from larger to smaller #top 5
 bottom5 = google.sort_values(ascending=False).tail()
@@ -8,7 +9,7 @@ topandbottom = pd.DataFrame({"Top5":top5.values,
 print(topandbottom)
 
 
-#if you startout with two dataframes that you want to joing you will have to reset index
+#if you startout with two Series that you want to joing you will have to reset index
 richandpoor = nba2['Category Salary'] =nba2['Salary'].sort_values().map(Salary_Group)
 top5riches = nba2.head()
 bottom5riches = nba2.tail()
