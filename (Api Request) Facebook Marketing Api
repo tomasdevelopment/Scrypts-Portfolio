@@ -1,0 +1,72 @@
+import pandas as pd
+from facebook_business.adobjects.adaccount import AdAccount
+from facebook_business.adobjects.adsinsights import AdsInsights
+from facebook_business.api import FacebookAdsApi
+#37 months is the time limit 
+access_token = 'afssd123'
+app_secret = 'asd213'
+app_id = '123123'
+
+ad_account_id = 'act_1111100000'  # Account ID
+FacebookAdsApi.init(access_token=access_token)
+
+# fields = [
+#     'adset_id', 'ad_id', 'ad_name', 'impressions', 'account_id', 'account_name', 'action_values', 'actions',
+#     'adset_name', 'attribution_setting', 'buying_type', 'campaign_id', 'campaign_name', 'canvas_avg_view_percent',
+#     'canvas_avg_view_time','catalog_segment_value','clicks','conversion_rate_ranking','conversion_values',
+#     'conversions','converted_product_quantity'
+# ]
+##these are most of the available fields
+fields = [
+    'adset_id', 'ad_id', 'ad_name', 'impressions', 'account_id', 'account_name', 'action_values', 'actions',
+    'adset_name', 'attribution_setting', 'buying_type', 'campaign_id', 'campaign_name', 'canvas_avg_view_percent',
+    'canvas_avg_view_time', 'catalog_segment_value', 'clicks', 'conversion_rate_ranking',
+    'conversion_values', 'conversions', 'converted_product_quantity', 'converted_product_value', 'cost_per_action_type',
+    'cost_per_conversion', 'cost_per_estimated_ad_recallers', 'cost_per_inline_link_click', 'cost_per_inline_post_engagement',
+    'cost_per_outbound_click', 'cost_per_thruplay', 'cost_per_unique_action_type', 'cost_per_unique_click',
+    'cost_per_unique_inline_link_click', 'cost_per_unique_outbound_click', 'cpc', 'cpm', 'cpp', 'ctr', 'date_start',
+    'date_stop', 'dda_results', 'engagement_rate_ranking', 'estimated_ad_recall_rate', 'estimated_ad_recallers',
+    'frequency', 'full_view_impressions', 'full_view_reach', 'inline_link_click_ctr',
+    'inline_link_clicks', 'inline_post_engagement', 'instagram_upcoming_event_reminders_set', 'instant_experience_clicks_to_open',
+    'instant_experience_clicks_to_start', 'instant_experience_outbound_clicks', 'mobile_app_purchase_roas',
+    'objective', 'optimization_goal', 'outbound_clicks', 'outbound_clicks_ctr', 'place_page_name', 
+    'purchase_roas', 'qualifying_question_qualify_answer_rate', 'quality_ranking', 'reach',  
+    'social_spend', 'spend','video_30_sec_watched_actions', 'video_avg_time_watched_actions', 'video_p100_watched_actions',
+    'video_p25_watched_actions', 'video_p50_watched_actions', 'video_p75_watched_actions', 'video_p95_watched_actions',
+    'video_play_actions', 'video_play_curve_actions', 'website_ctr', 'website_purchase_roas'
+]# 'total_postbacks_detailed', 'total_postbacks_detailed_v4',
+#If you need post backs or post backs detailed it can't be requested with other fields
+fields2 = [   
+   'adset_id','total_postbacks_detailed'
+]
+# / 
+# fields2 = [   
+#    'total_postbacks','adset_id'
+# ]
+
+
+
+params = {
+    'time_range': {'since': '2022-01-01', 'until': '2024-01-01'},
+    'access_token': access_token,
+    'level': 'adset',
+    'breakdowns': [],
+}
+
+insights_data = AdAccount(ad_account_id).get_insights(
+    fields=fields,
+    params=params,
+)
+postbacksdata= AdAccount(ad_account_id).get_insights(
+    fields=fields2,
+    params=params,
+)
+print(type(insights_data))
+data_list = [dict(item) for item in insights_data] # this was useful to pull the data in a readable format. 
+print(data_list[0:5])
+df = pd.DataFrame(insights_data)
+df2= pd.DataFrame(data_list)
+df2.to_excel(r'C:\Users\facebookdic.xlsx',index=False)
+dfpostbacks = pd.DataFrame(postbacksdata)
+print(df.info())
+
