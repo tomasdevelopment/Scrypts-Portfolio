@@ -1,0 +1,22 @@
+#dashboard analysisempty_salaries = bond[bond['Bond Actor Salary'].isnull()] #filter by empty salary
+#without empty rows
+emptyrows = bond.dropna(axis=1,how='any')
+print(len(emptyrows.dtypes),emptyrows.shape,len(bond.dtypes),bond.shape)
+#count unique values 
+filmnumber = bond['Film'].nunique()
+filmnumber
+
+#count of duplicates in film name
+duplicatedfilms = bond['Film'].duplicated(keep='first').sum()
+duplicatedfilmsdb = bond[bond['Film'].duplicated(keep=False)] # its duplicated cause it has two year releases
+#get an array of the unique films names
+filmsunique = bond['Film'].unique()
+#drop earliest version of casino royale
+dropcasinofirstversion = bond.drop_duplicates(['Film'],keep='last')
+dropcasinolastversion =  bond.drop_duplicates(['Film'],keep='last')
+latestcasino = dropcasinofirstversion.set_index("Film").loc['Casino Royale']
+firstcasino = dropcasinolastversion.set_index("Film").loc['Casino Royale']
+casinodf = pd.DataFrame({'first casino:':firstcasino,
+                        'Second Casino': latestcasino
+                        })
+casinodf #analyse both versions of casino royale releases
