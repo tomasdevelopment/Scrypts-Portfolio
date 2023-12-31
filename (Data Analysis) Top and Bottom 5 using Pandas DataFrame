@@ -30,4 +30,4 @@ DFNBARICH = pd.DataFrame({'Top 5':top5riches['Salary'].reset_index(drop=True),
 
 #Simply store top 5 /botton 5 using nlargest and nsmallest
 bond.nlargest(n=4,columns=['Box Office']) # top 4
-bond.smallest(n=4,columns=['Box Office']) # bottom 4
+bond.nsmallest(n=4,columns=['Box Office']) # bottom 4
