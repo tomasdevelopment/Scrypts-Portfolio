@@ -1,0 +1,12 @@
+input_value = input("Enter a value: ")
+
+while input_value.lower() not in ['stop', 'para']:
+    result = check_if_number(input_value)
+    print(f"The input {input_value} {result}")
+    
+    if result is None:
+        input_value = input("Enter a value: ")
+    else:
+        break
+
+print("Exiting the program.")
