@@ -1,0 +1,15 @@
+def check_if_number(number):
+    if isinstance(number, (int, float, complex)):
+        return 'is a number'
+    else:
+        try:
+            complex_number = complex(number)
+            return 'is a number'
+        except ValueError:
+            print("Input data cannot be represented as a number")
+            return None
+
+# Example usage:
+input_value = input("Enter a value: ")
+result = check_if_number(input_value)
+print(f"The input {input_value} {result}")
