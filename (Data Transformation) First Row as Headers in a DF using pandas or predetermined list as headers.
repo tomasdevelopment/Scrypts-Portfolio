@@ -1,0 +1,16 @@
+# Use first row as headers
+import pandas as pd
+
+def rename_columns(df, names=None):  
+    # your code here
+    first_row = list(df.iloc[0])
+    columns  =list(df.columns)
+    joined = dict(zip(columns,first_row))
+    return df.rename(columns = joined)
+#use predetermined row as headers
+import pandas as pd
+
+def rename_columns(df, names):  
+    return df.rename(
+        columns=dict(zip(df.columns, names)))
+rename_columns(df,['a','b','c'])#
