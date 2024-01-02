@@ -1,0 +1,4 @@
+def date_parser(s):
+    return datetime.strptime(s, '%Y-%m-%d')
+
+bigmac = pd.read_csv("CSV/bigmac.csv",parse_dates =['Date'],date_parser=date_parser)
