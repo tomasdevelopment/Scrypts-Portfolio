@@ -1,3 +1,3 @@
 # 'dataset' holds the input data for this script
 import pandas as pd
-nombres = dataset[dataset['Nombres'].str.contains(' ')]
+nombres = dataset[dataset['Nombres'].str.contains(' ')] # this will return a new dataset to expand as query with only the names that include white spaces
