@@ -1,0 +1,3 @@
+# 'dataset' holds the input data for this script
+import pandas as pd
+nombres = dataset[dataset['Nombres'].str.contains(' ')]
