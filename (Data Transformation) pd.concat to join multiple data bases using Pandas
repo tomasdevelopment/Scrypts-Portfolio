@@ -1,0 +1,14 @@
+import pandas as pd
+foods = pd.read_csv('CSV/restaurant_foods.csv')
+customers = pd.read_csv("CSV/restaurant_customers.csv")
+week1=  pd.read_csv("CSV/restaurant_week_1_sales.csv")
+week2 = pd.read_csv('CSV/restaurant_week_2_sales.csv')
+pd.concat([week1,week2]).reset_index() #concat 500rows #default is trrue
+pd.concat([week1,week2], ignore_index=False) #reset_index() use this
+week3 = pd.DataFrame({"Customer ID":[1,2,3],
+                      "Food ID":[89,99,109]
+                     })
+pd.concat([week1,week2], ignore_index=True) #reset_index() use this
+concat2 =pd.concat([week1,week2,week3],keys=['Week 1','Week 2','Week 3']).rename(columns={"Customer ID":"ID do Cliente"}).sort_index(ascending=False)
+concat2.head() #ascending false head is the largest
+concat2.tail() # is the lowest
