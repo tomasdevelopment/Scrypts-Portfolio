@@ -12,3 +12,12 @@ pd.concat([week1,week2], ignore_index=True) #reset_index() use this
 concat2 =pd.concat([week1,week2,week3],keys=['Week 1','Week 2','Week 3']).rename(columns={"Customer ID":"ID do Cliente"}).sort_index(ascending=False)
 concat2.head() #ascending false head is the largest
 concat2.tail() # is the lowest
+
+#use this in case you join 2 df with different columns
+
+df1 = pd.DataFrame([1,2,3],columns = ['A'])
+df2 = pd.DataFrame([4,5,6],columns = ['B'])
+pd.concat([df1,df2])
+errordf = pd.concat([df1,df2],axis='index',ignore_index=True)#reset index is generally important to make sure you get an easily accesible new df
+correctedf = pd.concat([df1,df2],axis='columns')
+correctedf
