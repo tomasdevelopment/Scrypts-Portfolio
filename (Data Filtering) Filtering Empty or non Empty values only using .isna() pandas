@@ -1,0 +1,8 @@
+#filtering empty values only and non empty
+week3 = pd.DataFrame({"Customer ID":[1,2,3],
+                      "Food ID":[pd.NA,99,109]
+                     })
+condition = week3['Food ID'].isna()
+week3[condition] #filter only empty values
+week3.loc[~condition,:] #fill only non empty falues
+week3.loc[condition,:] #fill only empty
