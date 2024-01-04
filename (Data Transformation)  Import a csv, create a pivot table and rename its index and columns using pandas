@@ -1,0 +1,13 @@
+import pandas as pd
+foods = pd.read_csv('CSV/foods.csv')
+#create pivot table
+pivot =foods.pivot_table(values='Spend',index=['Item','City'], columns=['Gender'], aggfunc='sum')
+#index names modification
+pivot
+pivot.index.get_level_values(0) #Item
+pivot.index.get_level_values(1) #City
+pivot.index.set_names(names=['Items yo','City yo'],level=[0,1],inplace=True) # rename index
+#column stuff
+column_mapping ={"Female":"Fiminino"} # change column feminino for female
+pivot.rename(columns=column_mapping,inplace=True)
+pivot
