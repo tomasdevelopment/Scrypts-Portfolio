@@ -1,0 +1,4 @@
+stocks = pd.read_csv('CSV/ibm.csv',parse_dates=["Date"],index_col='Date')
+stocks.loc[pd.Timestamp(2014,3,4):"2015-3-4","Open":"Close"] #first argument represents index , second columns general info for indexing , not needed here
+birthdays = pd.date_range(start='1997-09-15',end='2024-09-15',freq=pd.DateOffset(years=1)) #with one year apart
+stocks[stocks.index.isin(birthdays)] # filter all stock price in your birthday, or specific time
