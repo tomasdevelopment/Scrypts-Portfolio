@@ -7,7 +7,7 @@ def running_average():
         nonlocal total, count ##allows the function to modify variables from the outside scope function
         total += new_number
         count += 1
-        return total / count if count != 0 else None
+        return round(total / count, 2)  if count != 0 else None
 
     return average
 
