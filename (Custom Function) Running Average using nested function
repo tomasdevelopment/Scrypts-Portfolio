@@ -1,0 +1,14 @@
+
+def running_average():
+    total = 0
+    count = 0
+    
+    def average(new_number):
+        nonlocal total, count ##allows the function to modify variables from the outside scope function
+        total += new_number
+        count += 1
+        return total / count if count != 0 else None
+
+    return average
+
+r_avg = running_average()
