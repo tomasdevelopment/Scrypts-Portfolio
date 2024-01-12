@@ -1,0 +1,6 @@
+def convert_to_datetime(df, date_columns):
+    for col in date_columns:
+        if col in df.columns and pd.api.types.is_datetime64_any_dtype(df[col]):
+            df[col] = pd.to_datetime(df[col], errors='coerce')
+            df[col] = df[col].dt.date
+    return df
