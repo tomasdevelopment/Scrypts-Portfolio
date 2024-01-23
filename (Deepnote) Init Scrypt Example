@@ -1,0 +1,9 @@
+%%bash
+if test -f requirements.txt; then
+    # Use a cross-platform compatible sed command
+    sed -i.bak '/jedi/d;/jupyter/d;' ./requirements.txt && rm ./requirements.txt.bak
+    # Use python -m to ensure pip is called correctly
+    python -m pip install -r ./requirements.txt
+else
+    echo 'There is no requirements.txt, so nothing to install.'
+fi
