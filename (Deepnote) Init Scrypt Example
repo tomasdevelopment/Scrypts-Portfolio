@@ -1,9 +1,20 @@
-%%bash
-if test -f requirements.txt; then
-    # Use a cross-platform compatible sed command
-    sed -i.bak '/jedi/d;/jupyter/d;' ./requirements.txt && rm ./requirements.txt.bak
-    # Use python -m to ensure pip is called correctly
-    python -m pip install -r ./requirements.txt
-else
-    echo 'There is no requirements.txt, so nothing to install.'
-fi
+import subprocess
+import os
+
+# Check if the requirements.txt file exists
+if os.path.isfile('requirements.txt'):
+    print('requirements.txt found. Modifying and installing packages...')
+
+    # Execute the sed command
+    subprocess.run(['sed', '-i.bak', '/jedi/d;/jupyter/d;', './requirements.txt'])
+    os.remove('./requirements.txt.bak')
+
+    # Execute pip install
+    result = subprocess.run(['python', '-m', 'pip', 'install', '-r', './requirements.txt'], capture_output=True, text=True)
+
+    if result.returncode == 0:
+        print('Installation successful.')
+    else:
+        print('Installation failed. Error:', result.stderr)
+else:
+    print('There is no requirements.txt, so nothing to install.')
