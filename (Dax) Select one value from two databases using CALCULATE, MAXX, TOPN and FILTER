@@ -1,0 +1,21 @@
+//get names from two platforms, use the second database as an alternative if the name not found on th firs
+
+Final Full name = 
+VAR FullNameLookup = LOOKUPVALUE(MainNamesDB[FullName], MainNamesDB[EmployeeID], 'EmployeeID Dimension'[EmployeeID])
+VAR EmpID = 'EmployeeID Dimension'[EmployeeID]
+VAR FirstMainPlatformName = 
+    CALCULATE(
+        MAXX(
+            TOPN(
+                1, 
+                FILTER(
+                    SecondaryNamesDB, 
+                    SecondaryNamesDB[EmployeeID] = EmpID
+                ), 
+                SecondaryNamesDB[Date] // This needs to be defined by your specific need
+            ), 
+            SecondaryNamesDB[Main Platform Name]
+        )
+    )
+RETURN
+IF(ISBLANK(FullNameLookup), FirstMainPlatformName, FullNameLookup)
