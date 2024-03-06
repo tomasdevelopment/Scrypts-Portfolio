@@ -1,0 +1,42 @@
+#Financial QA
+import pandas as pd
+
+
+file_path = 'LatestWeekReport.xlsx'
+df = pd.read_excel(file_path, engine='openpyxl', sheet_name='FINANCIALREPORT')
+def condition_contains(value, text):
+    # Ensure value is a string before checking if text is in value
+    if pd.isnull(value):  # Check for NaN values which are float
+        return False
+    return text in str(value)
+
+def filter_dataframe(df, condition_sets):
+    filtered_dfs = {}
+    for sheet_name, conditions in condition_sets.items():
+        filtered_indexes = []
+        for index, row in df.iterrows(): #iterate to all the rows
+            for condition in conditions:#iterate to all conditions
+                column_value = row[condition['column']] #apply the conditions to each row
+                # Convert column value to string only here, checked for NaN above
+                if condition['func'](column_value, condition['text']):
+                    filtered_indexes.append(index)
+                    break  # Stop checking other conditions if one is met
+        filtered_dfs[sheet_name] = df.loc[filtered_indexes]
+    return filtered_dfs
+
+
+# Define condition sets for each filter you want, specifying column names
+condition_sets = {
+    'FLTI': [{'column': 'Type Time', 'func': condition_contains, 'text': "FLTI"}], #flex time only
+    'REGULAR TIME': [{'column': 'Type Time', 'func': condition_contains, 'text': "REGULAR TIME"}], #reti time only
+    'OT':[{'column': 'Type Time', 'func':condition_contains,'text':"OVER TIME"}, #overtime all
+    {'column': 'Type Time','func':condition_contains,'text':'HOLIDAYS OVERTIME'} ]
+}
+
+# Filter the DataFrame based on condition sets
+filtered_dfs = filter_dataframe(df, condition_sets)
+# Save the filtered DataFrames to separate tabs in the same Excel file
+output_file_path = 'FilteredRowsAllInOne.xlsx'
+with pd.ExcelWriter(output_file_path, engine='openpyxl') as writer:
+    for sheet_name, filtered_df in filtered_dfs.items():
+        filtered_df.to_excel(writer, sheet_name=sheet_name, index=False)
