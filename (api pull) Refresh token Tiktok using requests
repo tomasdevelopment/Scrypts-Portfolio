@@ -1,0 +1,22 @@
+app_id ='7310036724745240577'
+client_secret = '2e15af48dc14130c2498490b4f1df6c8f1525e4f'
+def refresh_access_token(refresh_token):
+    url = 'https://business-api.tiktok.com/open_api/v1.3/tt_user/oauth2/refresh_token/'
+    headers = {'Content-Type': 'application/json'}
+    payload = {
+        'client_id': app_id,
+        'client_secret': client_secret,
+        'grant_type': 'refresh_token',
+        'refresh_token': refresh_token
+    }
+    response = requests.post(url, headers=headers, json=payload)
+    if response.status_code == 200:
+        data = response.json().get('data', {})
+        new_access_token = data.get('access_token')
+        global global_access_token
+        global_access_token = new_access_token
+        return new_access_token
+    else:
+        app.logger.error(f"Failed to refresh token: {response.content}")
+        return None
+print(refresh_access_token('rft.eWs2eEYgdEiKhwiAMpWiHxbibPSsiceXEMXpQRBHkoy6PyLNBxX6i94MrN8I!4636'))
