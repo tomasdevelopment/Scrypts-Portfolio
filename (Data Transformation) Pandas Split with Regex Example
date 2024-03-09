@@ -1,0 +1,30 @@
+import pandas as pd
+
+ig_media_reach = {'id':['este perro hp/melamama/enreversa/Sapo']}
+ig_media_reach = pd.DataFrame(ig_media_reach)
+ig_media_copy = ig_media_reach.copy()
+ig_media_copy2 = ig_media_reach.copy()
+
+ig_media_reach['id'] = ig_media_reach['id'].str.split('/').str[0]
+ig_media_copy['id'] = ig_media_copy['id'].str.split('/',n=2,expand = False) #control the nombre of splits
+split_columns = ig_media_copy2['id'].str.split('/', n=2, expand=True)
+
+
+print(split_columns,'columns split')#
+
+
+# Example DataFrame
+df = pd.DataFrame({
+    'text': ['apple-orange', 'banana;pear', 'grape|lemon']
+})
+
+# Splitting without using regex (treats the delimiter as a simple string)
+# This will not work as expected because it treats ';' as a literal character to split on,
+# not as a regular expression pattern.
+df['split_no_regex'] = df['text'].str.split(';', expand=False)
+
+# Splitting with regex=True (interprets the delimiter as a regular expression)
+# This example splits the string on '-', ';', or '|'
+df['split_with_regex'] = df['text'].str.split('-|;|\|', expand=False, regex=True)
+
+print(df)
