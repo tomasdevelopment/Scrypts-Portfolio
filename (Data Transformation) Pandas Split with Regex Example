@@ -26,5 +26,7 @@ df['split_no_regex'] = df['text'].str.split(';', expand=False)
 # Splitting with regex=True (interprets the delimiter as a regular expression)
 # This example splits the string on '-', ';', or '|'
 df['split_with_regex'] = df['text'].str.split('-|;|\|', expand=False, regex=True)
+#you could also split them using  the character class []
+df['split_with_regex_characterclass'] = df['text'].str.split('[|;-]',expand=False,regex=True)
 
 print(df)
