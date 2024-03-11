@@ -1,17 +1,5 @@
 import pandas as pd
 
-ig_media_reach = {'id':['este perro hp/melamama/enreversa/Sapo']}
-ig_media_reach = pd.DataFrame(ig_media_reach)
-ig_media_copy = ig_media_reach.copy()
-ig_media_copy2 = ig_media_reach.copy()
-
-ig_media_reach['id'] = ig_media_reach['id'].str.split('/').str[0]
-ig_media_copy['id'] = ig_media_copy['id'].str.split('/',n=2,expand = False) #control the nombre of splits
-split_columns = ig_media_copy2['id'].str.split('/', n=2, expand=True)
-
-
-print(split_columns,'columns split')#
-
 
 # Example DataFrame
 df = pd.DataFrame({
