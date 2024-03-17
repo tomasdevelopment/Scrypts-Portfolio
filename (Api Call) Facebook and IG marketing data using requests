@@ -1,0 +1,34 @@
+import requests
+import pandas as pd
+ACCESS_TOKEN ='123' #authorized by your facebook app
+AD_ACCOUNT_ID = 'act_1234'
+data_endpoint = f"https://graph.facebook.com/v18.0/{AD_ACCOUNT_ID}/ads?access_token={ACCESS_TOKEN}"
+# Set the security token as a header in the request
+#headers = {'Authorization': security_token}
+
+# Making a request to the data endpoint with the security token in the headers
+data_response = requests.get(data_endpoint)
+
+print(data_response)
+
+# Check if data retrieval was successful
+if data_response.status_code == 200:
+    try:
+        # Ensure that the response content is loaded as a JSON
+        profile_data = data_response.json()
+        print(type(profile_data))
+        # If the response is a string, convert it to a dictionary
+    
+
+        # Create a DataFrame from the extracted information
+        fbmarketing_df = pd.DataFrame(data_list)
+
+        # Display the DataFrame columns for debugging
+        print("DataFrame:", fbmarketing_df.columns)
+  
+
+    except json.JSONDecodeError as e:
+        print("JSON decoding error:", e)
+else:
+    print("Failed to retrieve data. Status Code:", data_response.status_code)
+    print("Response:", data_response.text)
