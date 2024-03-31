@@ -1,0 +1,29 @@
+import MySQLdb
+import sshtunnel
+from paramiko.ssh_exception import AuthenticationException
+
+sshtunnel.SSH_TIMEOUT = 5.0
+sshtunnel.TUNNEL_TIMEOUT = 5.0
+
+try:
+    with sshtunnel.SSHTunnelForwarder(
+        ('ssh.pythonanywhere.com', 22),
+        ssh_username='yoursshusername', ssh_password='yourssh!', #web server password
+        remote_bind_address=('youserver.mysql.pythonanywhere-services.com', 3306)
+    ) as tunnel:
+        connection = MySQLdb.connect(
+            user='dbuser',
+            passwd='dbpassword',
+            host='127.0.0.1', port=tunnel.local_bind_port, #port where dbiss
+            db='dbuser$dbname', ##change your db here
+        )
+        # Do stuff
+        query = "SELECT * FROM yourtablename"  # Change 'your_table' to the name of your table
+        df = pd.read_sql(query, connection)
+        # Print the head of the DataFrame
+        print(df.head())
+        connection.close()
+except AuthenticationException:
+    print("Authentication failed. Please check your credentials.")
+except Exception as e:
+    print("An error occurred:", str(e))
