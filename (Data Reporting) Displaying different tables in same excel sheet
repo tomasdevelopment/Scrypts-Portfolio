@@ -1,0 +1,7 @@
+BrandFile = os.path.join(output_dir, 'Brand Report.xlsx')
+  with pd.ExcelWriter(BrandFile, engine='openpyxl') as writer:
+    Brandpivot.to_excel(writer, sheet_name='Brand', index=False)
+    # Starting the second table right next to the first table, adjust startcol as needed
+    Brandpivot2.to_excel(writer, sheet_name='Brand', startcol=len(Brandpivot.columns) + 2, index=False)
+    Brandpivot3.to_excel(writer, sheet_name='Brand',startrow=len(Brandpivot.index)+2, startcol=len(Brandpivot.columns) + 2, index=False)
+    print(f'Saving  report file: {BrandFile}')
