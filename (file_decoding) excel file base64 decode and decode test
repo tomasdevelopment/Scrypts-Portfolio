@@ -1,0 +1,50 @@
+##use this to test if your encoded file was properly encoded for utf-8 base64
+
+import pandas as pd
+import json
+import requests
+import base64
+
+# Path to the original Excel file
+original_file_path = "/work/File_Todecode
+
+# Function to read and display the Excel file to ensure it exists and can be read properly
+def read_excel_file(file_path):
+    try:
+        df = pd.read_excel(file_path)
+        print("File read successfully.")
+        return df
+    except Exception as e:
+        print(f"Error reading the Excel file: {e}")
+        return None
+
+# Function to encode the Excel file to base64
+def encode_file_to_base64(file_path):
+    try:
+        with open(file_path, "rb") as file:
+            encoded_file = base64.b64encode(file.read()).decode('utf-8')
+            print(encoded_file[:100])  # Print the first 100 characters for inspection
+            return encoded_file
+    except Exception as e:
+        print(f"Error encoding the file: {e}")
+        return None
+
+# Read the original Excel file to ensure it exists
+df = read_excel_file(original_file_path)
+
+# Encode the file to base64 if it was read successfully
+if df is not None:
+    encoded_file = encode_file_to_base64(original_file_path)
+    if encoded_file:
+        # Decode the base64 content
+        decoded_file = base64.b64decode(encoded_file)
+
+        # Save the decoded file
+        with open("decoded_file.xlsx", "wb") as f:
+            f.write(decoded_file)
+
+        print("Decoded file saved successfully.")
+    else:
+        print("Failed to encode the file.")
+else:
+    print("Failed to read the original Excel file.")
