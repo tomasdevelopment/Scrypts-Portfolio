@@ -1,0 +1,11 @@
+def map_pandas_dtype_to_sql(dtype):
+    if pd.api.types.is_integer_dtype(dtype):
+        return 'BIGINT' if dtype == 'int64' else 'INTEGER'
+    elif pd.api.types.is_float_dtype(dtype):
+        return 'FLOAT'
+    elif pd.api.types.is_bool_dtype(dtype):
+        return 'BOOLEAN'
+    elif pd.api.types.is_datetime64_any_dtype(dtype):
+        return 'TIMESTAMP'
+    else:
+        return 'VARCHAR(255)'
